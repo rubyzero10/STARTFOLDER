@@ -36,7 +36,7 @@ Then show the data set (using kable code) ( Tbale (ref) )
 
 Paragraph about 
 We are interested in the relationship between x and y becuase z
-Figure X shows the relationship between 
+Figure X shows the relationship between h
 
 
 Our data is of penguins (Figure \@ref(fig:bills)).
