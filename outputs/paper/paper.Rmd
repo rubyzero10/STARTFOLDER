@@ -1,11 +1,10 @@
 ---
 title: "Paper 1 (subject to change;marriage)"
 author: 
-  - Oluwa
-  - Another author
+  - Oluwabusayomi Adekuajo
 thanks: "Code and data are available at: https://github.com/rubyzero10/STARTFOLDER"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "(past tense) First sentence(broad and insperational. Second sentence(specific of what I did). Third sentence(findings). Fourth sentence(why it maters)."
 output:
   bookdown::pdf_document2
 toc: FALSE
@@ -20,12 +19,25 @@ library(palmerpenguins)
 ```
 
 # Introduction
+First paragraph is motivational and broad, similar to first sentence of abstract with more substance
 
+Second para is about what we done and found 
+
+Third para is about implications 
+
+The remainder of this paper is: Section ... ex section explains the data... section \@ref(result) covers reseults ...
 You can and should cross-reference sections and sub-sections. For instance, Section \@ref(data). R Markdown automatically makes the sections lower case and adds a dash to spaces to generate labels, for instance, Section \@ref(first-discussion-point). 
 
 
 
 # Data
+Paragraph or two introducing the dataset broadly. 
+Then show the data set (using kable code) ( Tbale (ref) )
+
+Paragraph about 
+We are interested in the relationship between x and y becuase z
+Figure X shows the relationship between 
+
 
 Our data is of penguins (Figure \@ref(fig:bills)).
 
