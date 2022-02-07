@@ -16,7 +16,9 @@
 install.packages("tidyverse")
 install.packages("opendatatoronto")
 install.packages("usethis")
+install.packages("knitr")
 
+library(knitr)
 library(tidyverse)
 library(opendatatoronto)
 
@@ -38,14 +40,29 @@ drug_data <- filter(resources, row_number()==1) %>% get_resource()
 drug_data
 
 write_csv(drug_data, "inputs/data/overdoesdata.csv")
+write_csv(drug_data, "verdoesdat.csv")
+read.csv("verdoesdat.csv")
 #changing dta that is used in graph 
 overdoesdata <- read.csv("inputs/data/overdoesdata.csv")
+overdoesdata <- read.csv("verdoesdat.csv")
 overdoesdata$year = paste(overdoesdata$year, overdoesdata$year_stage)
 g = as.numeric(overdoesdata$fatal_overdoses_incident)
+g
 r <- is.na(g)
 g[r] = 0
 overdoesdata$fatal_overdoses_incident = g
 ind <- (which(r == T, arr.ind=TRUE))
+
+
+overdoesdata <- read.csv("verdoesdat.csv")
+overdoesdata$year = paste(overdoesdata$year, overdoesdata$year_stage)
+g = as.numeric(overdoesdata$fatal_overdoses_incident)
+g
+r <- is.na(g)
+g[r] = 0
+overdoesdata$fatal_overdoses_incident = g
+write_csv(overdoesdata, "overdoesdata0.csv")
+
 
 #mutate(fatal_overdoses_incident = as.numeric(fatal_overdoses_incident))|>
 #mutate((fatal_overdoses_incident[which(is.na(as.numeric(fatal_overdoses_incident)) == T, arr.ind=TRUE)])|>
@@ -58,16 +75,18 @@ overdoes_clean <-
   #mutate(year_stage=paste(year, year_stage)) |>
   select(year_stage, year, id, suspected_non_fatal_overdoses_incidents) 
 
+write_csv(overdoes_clean, "inputs/data/overdoesdataclean.csv")
  
 write.csv(overdoes_clean, file = 'cleaned_ overdoes_clean')
 
 #create table of overdoes per year 
 
-over <- read_csv('cleaned_ overdoes_clean',
+over <- read_csv("inputs/data/overdoesdataclean.csv",
   show_col_types = FALSE)
+over <- read.csv("verdoesdat.csv")
 
 (which(over == "Total", arr.ind=TRUE))
-r <- (which(over2 == "Total", arr.ind=TRUE))
+r <- (which(over == "Total", arr.ind=TRUE))
 r2 <- r[,1]
 over2 <- over[-r2,]
 
@@ -75,9 +94,9 @@ over2 <- over[-r2,]
 over2 |>
   group_by(year) |> 
   summarize(not_fatal_overdos = mean(suspected_non_fatal_overdoses_incidents)) |>
-  kable(caption = "Non-Fatal Suspected Opioid Overdoses Since 2018",
+  kable(caption = "Non-Fatal Suspected Opioid Overdoses Since 2018 in The Shelter System",
         col.names = c("Year", "Average quarterly number of Non-Fatal Overdoses"),
-        digits = 1,
+        digits = 0,
         booktabs = TRUE,
         linesep = ""
         )
@@ -89,7 +108,7 @@ over2 |>
 over2 |>
   filter(year <= '2020') |>
   group_by(year_stage) |> # We want to know the occupancy by month
-  summarize(not_fatal_overdos = mean(suspected_non_fatal_overdoses_incidents)
+  summarize(not_fatal_overdos = mean(suspected_non_fatal_overdoses_incidents))
   kable()
             
 

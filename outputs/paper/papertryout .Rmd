@@ -1,0 +1,115 @@
+---
+title: "Opioid Overdoses in the Shelter System"
+author: 
+  - Oluwabusayomi Adekuajo
+thanks: "Code and data are available at: https://github.com/rubyzero10/STARTFOLDER"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: "The consequences of drug use are widespread, including possibility of overdose when a drug substance has been consumed in a greater amount that can be handled by the body. We used data provided by the City of Toronto about fatal and non-fatal suspected opioid overdoses in the shelter system and analyzed it using a graph. We found that that the quarterly number of non-fatal overdoses was higher in later years, and that a positive increasing correlation between fatal and non-fatal incidences existed. Our findings have implication for drug prevention in shelters."
+output:
+  bookdown::pdf_document2
+toc: FALSE
+bibliography: references.bib
+---
+
+
+
+```{r setupme, include=FALSE}
+
+
+library(knitr)
+library(janitor)
+library(opendatatoronto)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+
+```
+
+# Introduction
+No one is truly safe from developing issues with drug use, as it is not restricted by age, race, income, or other social factors. Most associate drug use with the recreational consumption of illegal drugs, however, the improper use of legal medication, with or without medical supervision, can also contributed to abuse. Abuse is foundational, not only on the frequency and amount of substance taken, but it is mainly defined by the devastating impact it has on one’s life due to the inability to resists harmful urges. The consequences of drug use are all but limited to incorporating negative effects on mental and physical health, destroying relationships with friends and family, and establishing damaging behaviors due to lack of control. Overdose is another possible consequence of drug use and occurs when a drug substance has been consumed in a greater amount than the body can handle. In many cases, overdoses are fatal, causing their users to die prematurely. Although most individuals who have overdosed can be saved if medical treatment is provided quickly enough, leading to what is known as a non-fatal overdose.
+ 
+In this paper, the state of the drug abuse problem in the shelter system of Toronto, was explored through focusing on overdose incidences and its prevalence through the years. We obtained the number of quarterly fatal, and non-fatal suspected, opioid incidents in emergency shelters in Toronto starting from the first quarter of 2018. A table averaging the number of non-fatal overdoses each year was then constructed, in which it was found that the quarterly number of non-fatal overdoses was highest in 2021 compared to previous years. The relationship between fatal and non-fatal suspected overdoses was also explored. We find that, generally, the more non-fatal overdoses there are in a year quarter, there are also more fatal overdoses reported. Our findings imply that non-fatal opioid overdoses can have an effect on opioid related morbidity in shelter systems, and in order to prevent either, drug prevention methods could be invested for in future years 
+ 
+The remainder of this paper is structured as follows: Section \@ref(data) explains the data 
+
+
+# Data
+
+Data about fatal and non-fatal suspected opioid overdoses in the shelter system was acquired from the city of Toronto open data set using `opendatatoronto` pakage [@citeopendatato]. It displayed information regarding opioid overdoses from the first quarter of 2018 in emergency shelters, shelter-hotels, and 24-hour respite sites in each quarter. At the time of data collection, only three quarters of 2021 had been fully recorded. This could result in skewing of distributions and bias introduced in analysis. In attempt to counter this, average amounts of opioid overdoses in the shelter system(s) were recorded instead of calculated totals.
+ 
+Overdose cases were identified through different organizations, with non-fatal incidents suspected by the expertise of Toronto Paramedic Services; an opioid overdose was recognised based on physical and circumstantial information. It must be noted that this creates potential inaccuracy in the dataset as only incidents where Toronto Paramedic Services are called are captured in the non-fatal suspected opioid overdose incident data set. Fatal incidents are then identified by the Ontario Office of the Chief Coroner. Duplication of incidences in the fatal and non-fatal data set is possible as a patient identified by Toronto Paramedic Services as experiencing a non-fatal suspected opioid overdose who later dies in hospital will be captured in both fatal and non-fatal data sets. Since there is no way of differentiating the duplicated information from the stand alone, it is important to keep this in mind when exploring data that involves both variables. 
+
+```{r eval=FALSE, include=FALSE}
+#Our data is of average non-fatal overdoses (Table \@ref(tab:dataextract)).
+#avg
+```
+
+
+```{r dataextract, echo = FALSE}
+#contruct table 
+over <- read.csv("verdoesdat.csv")
+#removing Total row 
+r <- (which(over == "Total", arr.ind=TRUE))
+r2 <- r[,1]
+over2 <- over[-r2,]
+
+over2 |>
+  group_by(year) |> 
+  summarize(not_fatal_overdos = mean(suspected_non_fatal_overdoses_incidents)) |>
+  kable(caption = "Non-Fatal Suspected Opioid Overdoses Since 2018 in The Shelter System",
+        col.names = c("Year", "Average quarterly number of Non-Fatal Overdoses"),
+        digits = 0,
+        booktabs = TRUE,
+        linesep = ""
+        )
+
+```
+Analysis of data was done using the statistical programming language R [@citeR] along with packages that aided to clean, tidy, and manipulated dataset, tidyverse [@citetidyverse], janitor [@citejan], tidyr [@citetid], dplyr [@citedplyr]. We are interested in understanding the average amount of quarterly non-fatal cases over each year. In order to do this the following variables indicating year stage, which quarter of the year, year, id, and suspected non-fatal overdoses incidents, were selected. In the variable labeled year stage, there was row for total, which tallied the all the suspected non-fatal overdoses incidents over the year. For the purpose of averaging quarterly non-fatal cases, it was necessary to remove this row, as all information can be summarized through the quarterly submissions. From here a table of the average quarterly number of non-fatal overdoses for each year after 2018 was made (Table \@ref(tab:dataextract)). Tables were built using knitr[@citeknit].
+
+We found that that the quarterly number of non-fatal overdoses was higher in the most recent year of 2021 compared to the starting year of 2018. Table \@ref(tab:dataextract) shows an increase from just an average of 79 cases in 2018 to an average of 346 in 2021 can be observed. The amount of average non-fatal overdoses tends to increase significantly each year in the shelter system. The increment of this increase extends each year as well, starting with an average increase of 26 cases between the years 2018 and 2019. This difference doubled to an addition of 52 cases between the years 2019, and 2020. The largest growth of overdose incidences occurred from years 2020 to 2021 with an average increase of about 144 cases, which is almost 3 times the previous increment. Mentioned earlier, 2021 did not have all the quarters documented, so it is possible that this increment increase is more or less than what is displayed. It can be seen that the average non-fatal overdose reports have significantly increased more than 4 times the original value, indicating an obvious problem drug use prevention in the Toronto shelter system.
+
+```{r graphinfo, fig.cap="Graph of relationship between Fatal and Non-Fatal Overdoses", echo = FALSE, warning=FALSE, message=FALSE}
+#changing data that is used in graphand contains new variables 
+overdoesdata <- read.csv("verdoesdat.csv")
+overdoesdata$year = paste(overdoesdata$year, overdoesdata$year_stage)
+g = as.numeric(overdoesdata$fatal_overdoses_incident)
+r <- is.na(g)
+g[r] = 0
+overdoesdata$fatal_overdoses_incident = g
+
+overdoesdata |>
+    ggplot(aes(x = suspected_non_fatal_overdoses_incidents, y = fatal_overdoses_incident,
+               color = year)) +
+    geom_point(alpha=.8) +
+  labs(x = "Non-Fatal Suspected Opioid Overdoses ",
+       y = 'Fatal Opioid Overdose Incident')
+
+```
+
+```{r eval=FALSE, include=FALSE}
+Our data is of overdoses (Figure \@ref(fig:graphinfo))
+```
+
+Though non-fatal incidents do suggest the absences of mortality, all overdoses can be fatal if medical health is not reached quickly enough. Due to this fact, interest peeked to discover whether there was a potential relationship between non-fatal, and fatal opioid overdose reports.
+The variables of interest changed and included the row containing the total in the year stages variable, along with the merge of the year, and year stage to one variable. This allowed the specification of yearly quarter to be perceived visually. The variable, fatal overdose incidents, was also added. The amount of fatal overdose occurs at a much less frequent manner than do non-fatal cases; quarters with fewer than 5 reports of an overdose were suppressed to simply contain “< 5” instead of a value. In order to properly visualize data using a scatterplot, all instances of “<5” were changed to 0. From here a graph was made to show the relationship between non-fatal suspected and fatal opioid overdoses (Figure \@ref(fig:graphinfo)); graph was made in ggplot2[@citeggplot]
+
+In Figure \@ref(fig:graphinfo) it is clear to see that there was in fact a relationship between the two reports of an overdose incidents. There are about three groups that were identified in the graph. The first group were fatal overdose cases that were less than 5, labeled as 0. All of these cases gathered towards the lower portion of the graph, where the smaller amount of non-fatal overdoses was recorded. This groups findings suggest that a smaller amount of non-fatal cases is associated with small amount fatal overdose cases. Particularly all, but one instance, of non-fatal cases reported under 200 had less than 5 fatal occurrences. The next group that could be seen in Figure \@ref(fig:graphinfo)are the fatal cases that were between less than 5, or 0 in the visualization, and 20. This group scattered nicely within the more than 200 and less and 750 non-fatal cases portion. Though some variability is present, there is a positive increasing correlation within the group itself, as well as in the graph overall suggesting a relationship between variables. The last group contained values upwards of 40 fatal cases, and 750 non-fatal cases. While this information further implies the relationship discussed from other groups, this group specifically shows the impact which is the increase of both non-fatal and fatal overdoses in the years. Remember that 2021 only contained three quarters of information, but here shows more non-fatal and a similar number of fatal cases as in 2020. (Cite graph) shows that there is indeed a clear relationship between non-fatal, and fatal opioid overdose reports. These findings are of interest to the city of Toronto and specifically shelter systems, to aim to decrease or prevent further increase of overdose cases in the years
+
+
+
+
+\newpage
+
+\appendix
+
+
+# Appendix {-}
+
+
+# Additional details
+
+\newpage
+ 
+# References
+
+
